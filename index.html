@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Hirschsprung Disease | Congenital Megacolon | MCN Pillitteri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fef08a;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0d9488; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .locked-section { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+        .flashcard { background: #fff; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; border: 1px solid #e2e8f0; }
+        .flashcard:hover { transform: translateY(-5px); }
+        .analogy-box { background: #ccfbf1; border-left: 8px solid #0d9488; padding: 1rem; border-radius: 1rem; margin: 1rem 0; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { hd: { light: '#ccfbf1', DEFAULT: '#0d9488', dark: '#0f3a34' } } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-hd-dark text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none">
+            <i class="fa-solid fa-stethoscope mr-2"></i> Hirschsprung
+        </h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-hd-dark to-hd text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-solid fa-biohazard mr-2"></i> Hirschsprung Disease</h1>
+            <p class="text-sm text-teal-200 mt-1 font-medium">Congenital aganglionic megacolon | Pillitteri</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-hd-light text-hd-dark border-r-4 border-hd-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden"></i> Home / Start</button></li>
+                <li><button onclick="showSection('simple')" id="btn-simple" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-face-smile w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Hirschsprung Like You're 5</button></li>
+                <li><button onclick="showSection('definition')" id="btn-definition" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-book-open w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Definition & Epidemiology</button></li>
+                <li><button onclick="showSection('pathophysiology')" id="btn-pathophysiology" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-chart-line w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Pathophysiology & Genetics</button></li>
+                <li><button onclick="showSection('clinical')" id="btn-clinical" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-stethoscope w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Clinical Features (Newborn to Toddler)</button></li>
+                <li><button onclick="showSection('diagnosis')" id="btn-diagnosis" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-microscope w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Diagnosis & Tests</button></li>
+                <li><button onclick="showSection('management')" id="btn-management" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-hand-holding-medical w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Management & Surgical Procedures</button></li>
+                <li><button onclick="showSection('nursing')" id="btn-nursing" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-user-nurse w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Nursing Care & Complications</button></li>
+                <li><button onclick="showSection('prevention')" id="btn-prevention" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-shield-heart w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Prevention & Family Education</button></li>
+                <li><button onclick="showSection('flashcards')" id="btn-flashcards" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-cards w-6 text-hd nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Flashcards & Mnemonics</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-700 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-hd mr-1"></i> Active Recall</span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-800 to-hd-dark text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-biohazard text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-teal-300 mb-6 shadow-sm border border-white/20">
+                            <i class="fa-solid fa-hand-holding-heart text-5xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-300 mb-2 uppercase tracking-widest">Maternal & Child Health Nursing</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">Hirschsprung Disease</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10 border border-white/20">
+                            <p class="text-lg text-white font-medium">"Congenital absence of ganglion cells in the distal colon → functional obstruction." – Pillitteri</p>
+                        </div>
+                        <button onclick="unlockFirstSection()" class="bg-slate-600 hover:bg-slate-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto focus:outline-none">
+                            Start Learning <i class="fa-solid fa-arrow-right ml-3"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- "Hirschsprung Like You're 5" -->
+            <section id="simple" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-face-smile text-hd mr-4"></i> Hirschsprung Disease Like You Are 5 Years Old</h2>
+                    <div class="analogy-box">
+                        <p class="text-lg font-bold">🧸 Imagine the large intestine (colon) is like a long squishy tube that pushes poop out.</p>
+                        <p>• In Hirschsprung disease, a <strong>small piece at the end</strong> (near the anus) is missing special nerves called <strong class="text-teal-700">ganglion cells</strong>.<br>
+                        • Without those nerves, that piece stays <strong>tight and squeezed</strong> all the time – like a <span class="text-amber-700">clogged pipe</span>.<br>
+                        • Poop builds up behind the tight part, and the colon above gets very big (megacolon).</p>
+                        <p class="mt-3">🩺 Doctors can <strong>remove the tight part and sew the healthy colon back</strong> so poop can go out easily.</p>
+                    </div>
+                    <div class="bg-teal-50 p-5 rounded-xl text-center mt-4">
+                        <i class="fa-solid fa-biohazard text-6xl text-hd"></i>
+                        <p class="font-bold mt-2">Aganglionic segment (no nerves) → narrow → proximal dilation</p>
+                        <svg width="250" height="100" viewBox="0 0 250 100" class="mx-auto mt-2">
+                            <rect x="20" y="40" width="180" height="20" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+                            <rect x="20" y="40" width="60" height="20" fill="#fecaca" stroke="#dc2626" stroke-width="2"/>
+                            <text x="50" y="30" text-anchor="middle" font-size="8" fill="#dc2626">Aganglionic</text>
+                            <text x="140" y="30" text-anchor="middle" font-size="8" fill="#0d9488">Dilated</text>
+                            <path d="M20,50 L15,50" stroke="#0d9488" stroke-width="2"/>
+                            <text x="10" y="55" font-size="8">anus</text>
+                        </svg>
+                    </div>
+                    <button onclick="openQuiz('simple')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Definition & Epidemiology -->
+            <section id="definition" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-book-open text-hd mr-4"></i> Definition & Epidemiology</h2>
+                    <p><strong>Hirschsprung disease (HD)</strong> – congenital absence of ganglion cells in the myenteric (Auerbach) and submucosal (Meissner) plexuses, usually in the distal colon, leading to functional obstruction. Also called congenital aganglionic megacolon.</p>
+                    <div class="grid md:grid-cols-2 gap-5 mt-4">
+                        <div class="bg-slate-50 p-4 rounded-xl"><strong>📊 Incidence</strong><br><span class="reveal-text">1 in 5,000 live births. More common in males (M:F ratio 4:1). Most cases are sporadic, but familial forms exist.</span></div>
+                        <div class="bg-slate-50 p-4 rounded-xl"><strong>🇵🇭 Philippines</strong><br><span class="reveal-text">Estimated 100‑150 new cases annually. Late diagnosis still occurs due to misdiagnosis as chronic constipation. Most common in full‑term infants (rare in preterm).</span></div>
+                    </div>
+                    <canvas id="hdChart" width="400" height="200" style="max-width:100%; margin-top:1rem;"></canvas>
+                    <div class="bg-teal-50 p-3 rounded-lg mt-4"><strong>⚠️ Key point:</strong> <span class="reveal-text">The aganglionic segment always begins at the internal anal sphincter and extends proximally for a variable length. Short‑segment disease (rectosigmoid) occurs in 80% of cases.</span></div>
+                    <button onclick="openQuiz('definition')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Pathophysiology & Genetics -->
+            <section id="pathophysiology" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-chart-line text-hd mr-4"></i> Pathophysiology & Genetics</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>🔬 Pathophysiology:</strong><br><span class="reveal-text">Lack of ganglion cells → absence of inhibitory (nitrinergic) neurons → failure of relaxation of the affected segment → functional obstruction → proximal bowel dilation (megacolon) → enterocolitis (bacterial overgrowth) → perforation risk.</span></div>
+                        <div><strong>🧬 Genetics:</strong><br><span class="reveal-text">• RET proto‑oncogene mutations account for 50% of familial and 15‑20% of sporadic cases.<br>• Associated with Trisomy 21 (Down syndrome) – 2‑10% of HD patients have Down syndrome.<br>• Other genes: EDNRB, EDN3, SOX10.</span></div>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-lg mt-4"><strong>📌 Associated syndromes:</strong> <span class="reveal-text">Down syndrome, Waardenburg syndrome, MEN2 (due to RET mutations), Mowat‑Wilson syndrome.</span></div>
+                    <button onclick="openQuiz('pathophysiology')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Clinical Features (Newborn to Toddler) -->
+            <section id="clinical" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-stethoscope text-hd mr-4"></i> Clinical Features</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>👶 Newborn (first 24‑48 hours):</strong><br><span class="reveal-text">• Failure to pass meconium (delayed >48 hours) – cardinal sign<br>• Abdominal distension, bilious vomiting<br>• Refusal to feed, irritability<br>• Rectal examination may explode with gush of stool and gas (after withdrawal of finger)</span></div>
+                        <div><strong>🧒 Infant / Toddler (short‑segment):</strong><br><span class="reveal-text">• Chronic constipation since birth<br>• Ribbon‑like stools, failure to thrive<br>• Distended abdomen, palpable fecal mass<br>• Enterocolitis: explosive diarrhea, fever, septic shock (life‑threatening)</span></div>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg mt-4"><strong>🚨 Hirschsprung‑associated enterocolitis (HAEC):</strong> <span class="reveal-text">Sudden fever, vomiting, explosive foul‑smelling diarrhea, abdominal distension → medical emergency.</span></div>
+                    <button onclick="openQuiz('clinical')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Diagnosis -->
+            <section id="diagnosis" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-microscope text-hd mr-4"></i> Diagnosis & Tests</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Contrast enema (barium enema):</strong> <span class="reveal-text">Shows transitional zone (narrow aganglionic segment → dilated proximal colon).</span></li>
+                        <li><strong>Anorectal manometry:</strong> <span class="reveal-text">Absence of rectoanal inhibitory reflex (RAIR) – diagnostic in older children (not reliable in newborns).</span></li>
+                        <li><strong>Rectal suction biopsy (gold standard):</strong> <span class="reveal-text">Histology shows absence of ganglion cells and presence of hypertrophic nerve trunks.</span></li>
+                        <li><strong>Calretinin immunohistochemistry:</strong> <span class="reveal-text">Absent staining in aganglionic segment.</span></li>
+                        <li><strong>Genetic testing:</strong> <span class="reveal-text">RET mutation analysis for familial cases and syndromic presentations.</span></li>
+                    </ul>
+                    <div class="bg-green-50 p-3 rounded-lg mt-4"><strong>🔍 Gold standard:</strong> <span class="reveal-text">Rectal suction biopsy (absence of ganglion cells).</span></div>
+                    <button onclick="openQuiz('diagnosis')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Management & Surgical Procedures -->
+            <section id="management" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-hand-holding-medical text-hd mr-4"></i> Management & Surgical Procedures</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>💊 Pre‑operative (decompression):</strong><br><span class="reveal-text">• IV fluids, NPO, nasogastric decompression<br>• Rectal irrigations (normal saline) daily to prevent enterocolitis<br>• Treat enterocolitis with IV antibiotics (metronidazole + gentamicin), fluids</span></div>
+                        <div><strong>⚕️ Definitive surgical procedures (pull‑through):</strong><br><span class="reveal-text">• Swenson (resect aganglionic segment, anastomosis)<br>• Soave (endorectal pull‑through)<br>• Duhamel (retrorectal anastomosis)<br>• Temporary colostomy may be needed in critically ill infants (if enterocolitis or massive distension)</span></div>
+                    </div>
+                    <div class="bg-rose-50 p-3 rounded-lg mt-4"><strong>📌 Surgical principles:</strong> <span class="reveal-text">Resect the entire aganglionic segment and pull through normal ganglionic colon to the anus. Done at 1‑3 months of age (after diagnosis, before severe enterocolitis).</span></div>
+                    <button onclick="openQuiz('management')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Nursing Care & Complications -->
+            <section id="nursing" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-user-nurse text-hd mr-4"></i> Nursing Care & Complications</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div><strong>👩‍⚕️ Pre‑operative nursing:</strong><br><span class="reveal-text">• Monitor abdominal girth, stool output<br>• Perform saline irrigations (prescribed) – warm, low pressure, using a soft catheter<br>• Strict I&O, daily weight<br>• Educate parents about signs of enterocolitis</span></div>
+                        <div><strong>🍼 Post‑operative care (after pull‑through):</strong><br><span class="reveal-text">• Assess for anastomotic leak (fever, peritonitis)<br>• Rectal dilations (if prescribed to prevent stricture)<br>• Monitor bowel function (diarrhea common initially)<br>• Skin care (perineal irritation from frequent stools)<br>• Pain management, early feeding as tolerated</span></div>
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded-lg mt-4"><strong>⚠️ Complications:</strong> <span class="reveal-text">• Enterocolitis (most common, can be fatal)<br>• Anastomotic leak, stricture<br>• Incontinence (transient after pull‑through)<br>• Constipation (residual aganglionosis or transition zone pull‑through)<br>• Perianal excoriation</span></div>
+                    <button onclick="openQuiz('nursing')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Prevention & Family Education -->
+            <section id="prevention" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-shield-heart text-hd mr-4"></i> Prevention & Family Education</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Prevention:</strong> <span class="reveal-text">No known primary prevention; prenatal detection of megacolon is possible by ultrasound (third trimester). Genetic counselling for families with RET mutations.</span></li>
+                        <li><strong>Parent teaching (pre‑op):</strong> <span class="reveal-text">How to perform rectal irrigations, signs of enterocolitis (fever, explosive diarrhea, abdominal distension), when to seek emergency care.</span></li>
+                        <li><strong>Parent teaching (post‑op):</strong> <span class="reveal-text">Rectal dilation schedule, perineal care, expected bowel patterns (frequent loose stools initially), follow‑up for fecal continence.</span></li>
+                        <li><strong>Long‑term follow‑up:</strong> <span class="reveal-text">Monitor for constipation, soiling, growth; most children achieve normal bowel control by school age.</span></li>
+                    </ul>
+                    <div class="bg-teal-50 p-3 rounded-lg mt-4"><strong>📞 Support resources:</strong> <span class="reveal-text">Philippine Society of Pediatric Gastroenterology, parent support groups for Hirschsprung disease.</span></div>
+                    <button onclick="openQuiz('prevention')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Next</button>
+                </div>
+            </section>
+
+            <!-- Flashcards & Mnemonics -->
+            <section id="flashcards" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 border-b-2 border-hd pb-3"><i class="fa-solid fa-cards text-hd mr-4"></i> Flashcards & Mnemonics</h2>
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-hd">Q: What is missing in Hirschsprung disease?</div><div class="flash-answer hidden mt-2">Ganglion cells (myenteric and submucosal)</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-hd">Q: Gold standard diagnostic test?</div><div class="flash-answer hidden mt-2">Rectal suction biopsy</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-hd">Q: Most common genetic mutation?</div><div class="flash-answer hidden mt-2">RET proto‑oncogene</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-hd">Q: Newborn cardinal sign?</div><div class="flash-answer hidden mt-2">Failure to pass meconium within 48 hours</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-hd">Q: Life‑threatening complication?</div><div class="flash-answer hidden mt-2">Hirschsprung‑associated enterocolitis (HAEC)</div></div>
+                        <div class="flashcard p-4" onclick="toggleFlash(this)"><div class="font-bold text-hd">Q: Surgical pull‑through example</div><div class="flash-answer hidden mt-2">Swenson, Soave, Duhamel</div></div>
+                    </div>
+                    <div class="mt-6 bg-teal-50 p-4 rounded-xl"><strong>🧠 Mnemonics</strong><br><span class="reveal-text">“H.I.R.S.C.H.” – History of delayed meconium, Intestinal obstruction, Rectal biopsy (gold), S‑shaped narrow segment on enema, Congenital, Hypertrophic nerve trunks.<br>“NO GANGLIA” – No ganglion cells, Obstruction, Ganglionic proximal dilation, Absent RAIR, Neonatal failure to pass meconium, Genetic (RET), Laparotomy / pull‑through, Internal anal sphincter involvement, Always aganglionic from anus.<br>“S.S.D.” – Swenson, Soave, Duhamel (pull‑through procedures).</span></div>
+                    <button onclick="openQuiz('flashcards')" class="mt-6 w-full bg-slate-800 text-white font-black py-3 rounded-xl">Take Quiz → Unlock Final Exam</button>
+                </div>
+            </section>
+
+            <!-- FINAL EXAM SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-500 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Final 50‑Item Exam: Hirschsprung Disease</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">Covers definition, epidemiology, pathophysiology, clinical features, diagnosis, management (surgery, irrigations), nursing care, complications, prevention, and mnemonics. Score ≥75% to pass.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md text-xl">Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <div id="quiz-questions-container" class="space-y-4 mt-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-hd text-white font-bold py-4 rounded-xl shadow-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100"></div>
+        </div>
+    </div>
+
+    <script>
+        // QUIZ DATA (10 questions each for sections)
+        const quizzes = {
+            simple: { title: "Hirschsprung Like You're 5", next: "definition", questions: [
+                { q: "In the analogy, what is missing in the intestine?", options: ["Special nerves (ganglion cells)","Blood vessels","Muscles","Mucus"], ans: 0 },
+                { q: "What happens to the tight part of the intestine?", options: ["It stays squeezed, blocking poop","It becomes extra stretchy","It disappears","It grows longer"], ans: 0 },
+                { q: "What is the name of the surgery to fix it?", options: ["Pull‑through","Heart surgery","Kidney transplant","Brain surgery"], ans: 0 },
+                { q: "Newborns with this disease often cannot pass:", options: ["Meconium (first poop)","Urine","Gas","Milk"], ans: 0 },
+                { q: "Which complication can be life‑threatening?", options: ["Enterocolitis (inflammation)","Cold","Rash","Cough"], ans: 0 }
+            ] },
+            definition: { title: "Definition & Epidemiology", next: "pathophysiology", questions: [
+                { q: "Hirschsprung disease is caused by absence of:", options: ["Ganglion cells in the colon","Crypts of Lieberkühn","Peyer patches","Lymph nodes"], ans: 0 },
+                { q: "Incidence of HD is approximately:", options: ["1 in 500","1 in 5,000","1 in 50,000","1 in 500,000"], ans: 1 },
+                { q: "Male to female ratio in HD is about:", options: ["1:1","2:1","4:1","10:1"], ans: 2 },
+                { q: "The aganglionic segment always begins at:", options: ["Cecum","Transverse colon","Internal anal sphincter","Splenic flexure"], ans: 2 },
+                { q: "Short‑segment disease (rectosigmoid) occurs in what percentage?", options: ["20%","50%","80%","95%"], ans: 2 }
+            ] },
+            pathophysiology: { title: "Pathophysiology & Genetics", next: "clinical", questions: [
+                { q: "Which gene mutation is most common in familial HD?", options: ["RET","CFTR","BRCA1","TP53"], ans: 0 },
+                { q: "Hirschsprung disease is associated with which chromosomal disorder?", options: ["Down syndrome (Trisomy 21)","Turner syndrome","Klinefelter","Edward syndrome"], ans: 0 },
+                { q: "The absence of ganglion cells leads to:", options: ["Failure of relaxation (functional obstruction)","Increased peristalsis","Hypermotility","Dilation only"], ans: 0 },
+                { q: "Proximal bowel dilation is due to:", options: ["Chronic obstruction","Primary abnormality","Infection","Medication"], ans: 0 },
+                { q: "Which syndrome is associated with HD and Waardenburg features?", options: ["Waardenburg syndrome","Cri‑du‑chat","Angelman","Prader‑Willi"], ans: 0 }
+            ] },
+            clinical: { title: "Clinical Features", next: "diagnosis", questions: [
+                { q: "The cardinal sign in a newborn with HD is:", options: ["Failure to pass meconium within 48 hours","Jaundice","Vomiting","Seizures"], ans: 0 },
+                { q: "What finding after digital rectal examination suggests HD?", options: ["Explosive gush of stool and gas","No stool","Bloody stool","Hard stool"], ans: 0 },
+                { q: "Hirschsprung‑associated enterocolitis (HAEC) presents with:", options: ["Fever, explosive diarrhea, abdominal distension","Constipation only","Painless rectal bleeding","Weight gain"], ans: 0 },
+                { q: "Infants with short‑segment HD typically present with:", options: ["Chronic constipation since birth","Acute intestinal obstruction at birth","Diarrhea only","Billous vomiting only"], ans: 0 },
+                { q: "Which of the following is NOT typical of HD?", options: ["Down syndrome association","Delayed meconium","Ribbon‑like stools","Watery diarrhea from birth"], ans: 3 }
+            ] },
+            diagnosis: { title: "Diagnosis", next: "management", questions: [
+                { q: "Gold standard for diagnosis of HD is:", options: ["Rectal suction biopsy","Barium enema","Anorectal manometry","Abdominal X‑ray"], ans: 0 },
+                { q: "Barium enema in HD shows:", options: ["Transition zone (narrow distal, dilated proximal)","Total colonic hypoplasia","Normal colon","Megacolon only"], ans: 0 },
+                { q: "Anorectal manometry finding in HD is:", options: ["Absent rectoanal inhibitory reflex (RAIR)","Normal RAIR","Increased resting pressure","Spasms"], ans: 0 },
+                { q: "Rectal biopsy shows absence of ganglion cells and presence of:", options: ["Hypertrophic nerve trunks","Cancer cells","Granulomas","Fibrosis"], ans: 0 },
+                { q: "Which immunohistochemical stain is used to detect ganglion cells?", options: ["Calretinin","CD20","CK7","S100"], ans: 0 }
+            ] },
+            management: { title: "Management & Surgery", next: "nursing", questions: [
+                { q: "Pre‑operative decompression includes:", options: ["Rectal irrigations with normal saline","Laxatives","Enemas with tap water","High‑fiber diet"], ans: 0 },
+                { q: "Which is NOT a pull‑through procedure for HD?", options: ["Ladd's procedure","Swenson","Soave","Duhamel"], ans: 0 },
+                { q: "Temporary colostomy is indicated in:", options: ["Severe enterocolitis or massive distension","All cases","Mild constipation","Outpatient"], ans: 0 },
+                { q: "Definitive pull‑through surgery is typically performed at age:", options: ["1‑3 months","Birth","1 year","5 years"], ans: 0 },
+                { q: "Rectal irrigations should be done with:", options: ["Normal saline (warm, low pressure)","Tap water","Hydrogen peroxide","Alcohol"], ans: 0 }
+            ] },
+            nursing: { title: "Nursing Care & Complications", next: "prevention", questions: [
+                { q: "Post‑operatively, the nurse should assess for:", options: ["Anastomotic leak (fever, peritonitis)","Constipation","Urinary retention","All of the above"], ans: 3 },
+                { q: "Hirschsprung‑associated enterocolitis (HAEC) is treated with:", options: ["IV fluids, antibiotics, rectal irrigations","High‑fiber diet","Laxatives","Surgery only"], ans: 0 },
+                { q: "A common post‑operative complication after pull‑through is:", options: ["Perianal excoriation (frequent stools)","Wound infection","Ileus","All of the above"], ans: 3 },
+                { q: "Nursing care for a child with HD includes:", options: ["Monitoring abdominal girth","Daily weights","Parent education on enterocolitis signs","All of the above"], ans: 3 },
+                { q: "Rectal dilations after pull‑through are used to prevent:", options: ["Stricture","Infection","Hemorrhage","Pain"], ans: 0 }
+            ] },
+            prevention: { title: "Prevention & Family Education", next: "flashcards", questions: [
+                { q: "Prenatal detection of HD may be suggested by:", options: ["Ultrasound showing megacolon (third trimester)","Maternal serum AFP","Amniocentesis","None"], ans: 0 },
+                { q: "Genetic counselling is recommended for families with:", options: ["RET mutation","Down syndrome only","All families","None"], ans: 0 },
+                { q: "Parents should be taught to recognize enterocolitis by:", options: ["Fever, explosive diarrhea, abdominal distension","Weight gain","Normal stools","Sleepiness"], ans: 0 },
+                { q: "After pull‑through, most children achieve bowel control by:", options: ["School age","Never","1 year","Adolescence"], ans: 0 },
+                { q: "What should a parent avoid doing for a child with undiagnosed HD?", options: ["Using laxatives or enemas without medical advice","Feeding","Holding the baby","Bathing"], ans: 0 }
+            ] },
+            flashcards: { title: "Flashcards & Mnemonics", next: "final_quiz_sec", questions: [
+                { q: "Mnemonic for HD features?", options: ["NO GANGLIA","C.A.R.E.","F.A.S.T.","H.E.L.P."], ans: 0 },
+                { q: "What does the 'N' in NO GANGLIA stand for?", options: ["No ganglion cells","Normal","Neonate","Nerve"], ans: 0 },
+                { q: "Surgical pull‑through procedures (mnemonic SSD) stands for:", options: ["Swenson, Soave, Duhamel","Surgery, Safety, Drain","Stoma, Suture, Dilation","None"], ans: 0 },
+                { q: "What does the 'H' in the mnemonic H.I.R.S.C.H. stand for?", options: ["History of delayed meconium","Hirschsprung","Hereditary","Hypoxia"], ans: 0 },
+                { q: "The most common genetic mutation in HD is:", options: ["RET","CFTR","BRCA1","p53"], ans: 0 }
+            ] }
+        };
+        // Build final 50-item exam
+        let finalQ = [];
+        for(let sec of ['simple','definition','pathophysiology','clinical','diagnosis','management','nursing','prevention','flashcards']) {
+            if(quizzes[sec]) finalQ.push(...quizzes[sec].questions.slice(0,6));
+        }
+        while(finalQ.length < 50) finalQ.push({ q: "The most important diagnostic test for Hirschsprung disease is:", options: ["Rectal suction biopsy","Barium enema","Abdominal X‑ray","Ultrasound"], ans: 0 });
+        quizzes.final_quiz = { title: "Final 50-Item Exam: Hirschsprung Disease", next: null, questions: finalQ };
+
+        let unlockedSections = ['home'];
+        let hdChart = null;
+
+        function initCharts() {
+            const ctx = document.getElementById('hdChart')?.getContext('2d');
+            if(ctx && !hdChart) {
+                hdChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Rectosigmoid (short)', 'Left colon', 'Total colonic', 'Total intestinal'],
+                        datasets: [{ label: 'Frequency (%)', data: [80, 10, 5, 5], backgroundColor: '#0d9488', borderRadius: 6 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+                });
+            }
+        }
+
+        function toggleFlash(el) { const ans = el.querySelector('.flash-answer'); if(ans) ans.classList.toggle('hidden'); }
+        function unlockFirstSection() { if(!unlockedSections.includes('simple')) { unlockedSections.push('simple'); updateSidebarUI(); } showSection('simple'); }
+        function showSection(sectionId) {
+            if (!unlockedSections.includes(sectionId) && sectionId !== 'home') { alert("Complete the Active Recall Quiz at the bottom of the previous section to unlock."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(sectionId)?.classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-hd-light','text-hd-dark','border-r-4','border-hd-dark'));
+            const activeBtn = document.getElementById('btn-'+sectionId);
+            if(activeBtn) activeBtn.classList.add('bg-hd-light','text-hd-dark','border-r-4','border-hd-dark');
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.add('hidden');
+            if(sectionId === 'definition' && !hdChart) setTimeout(initCharts, 50);
+        }
+        function updateSidebarUI() {
+            const sections = ['home','simple','definition','pathophysiology','clinical','diagnosis','management','nursing','prevention','flashcards','final_quiz_sec'];
+            sections.forEach(sec => {
+                const btn = document.getElementById('btn-'+sec);
+                if(!btn) return;
+                const lock = btn.querySelector('.fa-lock'), icon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lock) lock.classList.add('hidden'); if(icon) icon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lock) lock.classList.remove('hidden'); if(icon) icon.classList.add('hidden'); }
+            });
+        }
+        let currentQuiz=null;
+        function openQuiz(sectionId) { currentQuiz = sectionId; const qd = quizzes[sectionId]; if(!qd) return; document.getElementById('quiz-title').innerHTML = qd.title; const container = document.getElementById('quiz-questions-container'); container.innerHTML = ''; qd.questions.forEach((q, idx) => { let html = `<div class="bg-slate-50 p-4 rounded-xl mb-4"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2">`; q.options.forEach((opt,oi) => { html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-hd"><span>${opt}</span></label>`; }); html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`; container.innerHTML += html; }); document.getElementById('quiz-submit-btn').classList.remove('hidden'); document.getElementById('quiz-result-container').classList.add('hidden'); document.getElementById('quiz-modal').classList.remove('hidden'); }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            const qd = quizzes[currentQuiz];
+            if(!qd) return;
+            let score = 0;
+            for(let i=0; i<qd.questions.length; i++) {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                if(sel && parseInt(sel.value)===qd.questions[i].ans) score++;
+                const fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv){
+                    fbDiv.classList.remove('hidden');
+                    const correctTxt = qd.questions[i].options[qd.questions[i].ans];
+                    if(sel && parseInt(sel.value)===qd.questions[i].ans) { fbDiv.innerHTML='<span class="text-green-700">✓ Correct</span>'; fbDiv.parentElement?.classList.add('quiz-feedback-correct'); }
+                    else { const selectedTxt = sel? qd.questions[i].options[parseInt(sel.value)]:"No answer"; fbDiv.innerHTML=`<span class="text-red-700">✗ Incorrect. Correct: ${correctTxt}. You answered: ${selectedTxt}</span>`; fbDiv.parentElement?.classList.add('quiz-feedback-wrong'); }
+                }
+            }
+            let percent = (score/qd.questions.length)*100;
+            let resultDiv = document.getElementById('quiz-result-container');
+            document.getElementById('quiz-submit-btn').classList.add('hidden');
+            resultDiv.classList.remove('hidden');
+            if(percent>=75){
+                if(currentQuiz==='final_quiz'){ resultDiv.innerHTML=`<div class="text-green-600 text-4xl text-center">🎉 Excellent! Score ${score}/${qd.questions.length} (${percent}%)<br>You mastered Hirschsprung Disease!</div><button onclick="closeQuiz()" class="mt-4 bg-hd text-white px-6 py-2 rounded-xl">Close</button>`; return; }
+                if(quizzes[currentQuiz].next && !unlockedSections.includes(quizzes[currentQuiz].next)) unlockedSections.push(quizzes[currentQuiz].next);
+                if(quizzes[currentQuiz].next === 'flashcards' && !unlockedSections.includes('final_quiz_sec')) unlockedSections.push('final_quiz_sec');
+                updateSidebarUI();
+                resultDiv.innerHTML=`<div class="text-green-600 text-3xl text-center">✅ Passed! (${score}/${qd.questions.length})</div><button onclick="closeQuiz(); showSection('${quizzes[currentQuiz].next}')" class="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl">Unlock Next Section</button>`;
+            } else { resultDiv.innerHTML=`<div class="text-red-600 text-3xl text-center">❌ Failed: ${score}/${qd.questions.length} (${percent}%)<br>Need 75%</div><button onclick="openQuiz('${currentQuiz}')" class="mt-4 bg-slate-600 text-white px-6 py-2 rounded-xl">Try Again</button>`; }
+        }
+        function toggleRecallMode() { const active = !document.body.classList.contains('recall-mode'); const toggle=document.getElementById('recall-toggle'),knob=document.getElementById('recall-knob'); if(active){ document.body.classList.add('recall-mode'); toggle.classList.add('bg-hd-dark'); knob.classList.add('translate-x-6'); } else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-hd-dark'); knob.classList.remove('translate-x-6'); } }
+        function toggleMobileMenu() { const s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden','flex','absolute','h-full','z-50'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', () => { updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el => el.addEventListener('click', function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); })); });
+    </script>
+</body>
+</html>
